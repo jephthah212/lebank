@@ -23,6 +23,7 @@ public class MaInView extends javax.swing.JFrame {
     private TransactionManager transactionManager = new TransactionManager();
     private Budget budget = new Budget(1000);
     private List<SavingsGoal> savingsGoals = new ArrayList<>();
+
     /**
      * Creates new form MaInView
      */
@@ -60,7 +61,7 @@ public class MaInView extends javax.swing.JFrame {
             });
         }
     }
-    
+
 
     
 
@@ -1553,7 +1554,7 @@ public class MaInView extends javax.swing.JFrame {
             // Update table
             updateSavingsTable();
 
-            // Update progress bar 
+            // Update progress bar
             int progress = (int) goal.getProgressPercentage();
             jProgressBar1.setValue(progress);
 
@@ -1563,7 +1564,7 @@ public class MaInView extends javax.swing.JFrame {
             amtsavedfield.setText("");
 
             if (goal.isGoalReached()) {
-                JOptionPane.showMessageDialog(this, "🎉 Savings goal reached!");
+                JOptionPane.showMessageDialog(this, "Savings goal reached!");
             }
 
         } catch (NumberFormatException e) {
