@@ -1564,7 +1564,7 @@ public class MaInView extends javax.swing.JFrame {
             amtsavedfield.setText("");
 
             if (goal.isGoalReached()) {
-                JOptionPane.showMessageDialog(this, "Savings goal reached!");
+                JOptionPane.showMessageDialog(this, "Your Saving goals have been reached!");
             }
 
         } catch (NumberFormatException e) {
