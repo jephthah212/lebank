@@ -18,7 +18,7 @@ public class SavingsGoal {
         this.targetAmount = targetAmount;
         this.currentSavings = 0;
     }
-
+    
     public void deposit(double amount) {
         this.currentSavings += amount;
     }

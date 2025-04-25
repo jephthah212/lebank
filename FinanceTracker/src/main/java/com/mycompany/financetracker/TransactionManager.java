@@ -4,7 +4,9 @@
  */
 package com.mycompany.financetracker;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 /**
  *
  * @author onyighichijephthah
@@ -23,7 +25,18 @@ public class TransactionManager {
     }
 
     public int getNextId() {
-        return nextId;
+        List<Transaction> transactions = getAllTransactions();
+        Set<Integer> usedIds = new HashSet<>();
+
+        for (Transaction t : transactions) {
+            usedIds.add(t.getId());
+        }
+
+        int id = 1;
+        while (usedIds.contains(id)) {
+            id++;
+        }
+        return id;
     }
 
     public double getMonthlyExpenses() {

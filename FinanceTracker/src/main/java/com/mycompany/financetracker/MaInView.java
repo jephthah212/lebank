@@ -38,6 +38,7 @@ public class MaInView extends javax.swing.JFrame {
 
     private double totalIncome = 0;
     private double totalExpenses = 0;
+    private final FetchNews newsFetcher = new FetchNews();
 
     /**
      * Creates new form MaInView
@@ -48,40 +49,33 @@ public class MaInView extends javax.swing.JFrame {
         initComponents();
         loadAllData();
         updateTotalsUI();
-
+        setTitle("Finance Tracker");  
+        setLocationRelativeTo(null);  // center on screen
+        setResizable(false); 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 saveAllData();
             }
         });
         
-    }
-    
-    
-    private void showExpensePieChart() {
-        DefaultPieDataset dataset = new DefaultPieDataset();
-
-        // Aggregate expenses by category
-        for (Transaction t : transactionManager.getAllTransactions()) {
-            if (t.getType().equals("Expense")) {
-                String cat = t.getCategory();
-                double existing = dataset.getValue(cat) == null ? 0 : dataset.getValue(cat).doubleValue();
-                dataset.setValue(cat, existing + t.getAmount());
+        categoryfield.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent e) {
+                if (Character.isDigit(e.getKeyChar())) {
+                    e.consume();
+                }
             }
-        }
-
-        JFreeChart chart = ChartFactory.createPieChart(
-            "Expenses by Category", dataset, true, true, false
-        );
-
-        ChartPanel chartPanel = new ChartPanel(chart);
-        JFrame chartFrame = new JFrame("Expense Chart");
-        chartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        chartFrame.setContentPane(chartPanel);
-        chartFrame.setSize(600, 400);
-        chartFrame.setLocationRelativeTo(null);
-        chartFrame.setVisible(true);
+        });
+        
+        
+        
+        
+       newsPanel.setText("Fetching news...");
+       
     }
+    
+    
+    
+    
     
     
     
@@ -205,7 +199,7 @@ public class MaInView extends javax.swing.JFrame {
     private void initComponents() {
 
         jComboBox1 = new javax.swing.JComboBox<>();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        newspanel = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         categorylbl = new javax.swing.JLabel();
@@ -242,10 +236,11 @@ public class MaInView extends javax.swing.JFrame {
         remainingbudgetlbl = new javax.swing.JLabel();
         remainingbudgetlbl2 = new javax.swing.JLabel();
         budgetprogressbar = new javax.swing.JProgressBar();
-        jPanel6 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
+        jPanel7 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        newsPanel = new javax.swing.JTextArea();
+        searchField = new javax.swing.JTextField();
+        searchbtn = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         totalincomelbl = new javax.swing.JLabel();
         totalexpenselbl = new javax.swing.JLabel();
@@ -253,6 +248,9 @@ public class MaInView extends javax.swing.JFrame {
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(255, 0, 0));
+
+        newspanel.setBackground(new java.awt.Color(255, 0, 0));
 
         categorylbl.setText("Category:");
 
@@ -1368,7 +1366,7 @@ public class MaInView extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        jTabbedPane1.addTab("Transactions", jPanel1);
+        newspanel.addTab("Transactions", jPanel1);
 
         goalnamelbl.setText("Goal Name");
 
@@ -1577,7 +1575,7 @@ public class MaInView extends javax.swing.JFrame {
                 .addGap(19, 19, 19))
         );
 
-        jTabbedPane1.addTab("Savings", jPanel5);
+        newspanel.addTab("Savings", jPanel5);
 
         budgetlimitlbl.setText("Monthly Budget Limit:");
 
@@ -1641,34 +1639,49 @@ public class MaInView extends javax.swing.JFrame {
                 .addContainerGap(284, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Budget", jPanel4);
+        newspanel.addTab("Budget", jPanel4);
 
-        jButton1.setText("Show Expense Chart");
+        newsPanel.setColumns(20);
+        newsPanel.setRows(5);
+        jScrollPane3.setViewportView(newsPanel);
 
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addGap(57, 57, 57)
-                .addComponent(jButton1)
-                .addContainerGap(508, Short.MAX_VALUE))
+        searchField.setText("Finance");
+
+        searchbtn.setText("Search");
+        searchbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchbtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 595, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(99, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(searchbtn)
+                .addGap(50, 50, 50))
         );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addGap(35, 35, 35)
-                .addComponent(jButton1)
-                .addContainerGap(468, Short.MAX_VALUE))
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                .addContainerGap(10, Short.MAX_VALUE)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(searchbtn))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 469, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
-        jTabbedPane1.addTab("Charts", jPanel6);
-
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane3.setViewportView(jTextArea1);
-
-        jTabbedPane1.addTab("News", jScrollPane3);
+        newspanel.addTab("News", jPanel7);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -1693,7 +1706,7 @@ public class MaInView extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 717, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(newspanel, javax.swing.GroupLayout.PREFERRED_SIZE, 717, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(93, 93, 93)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -1711,7 +1724,7 @@ public class MaInView extends javax.swing.JFrame {
                         .addGap(354, 354, 354))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 561, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(newspanel, javax.swing.GroupLayout.PREFERRED_SIZE, 561, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(totalincomelbl)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1944,13 +1957,43 @@ public class MaInView extends javax.swing.JFrame {
 
     private void rmvsavingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rmvsavingsActionPerformed
         int selectedRow = jTable2.getSelectedRow();
+
         if (selectedRow >= 0) {
-            savingsGoals.remove(savingsGoals.size() - 1 - selectedRow); // reverse-order table
-            updateSavingsTable();
+            // Since table is in reverse order, map back to correct index
+            int actualIndex = savingsGoals.size() - 1 - selectedRow;
+
+            // Confirm before removing (optional)
+            int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to remove this savings goal?",
+                "Confirm Deletion",
+                JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                savingsGoals.remove(actualIndex);
+                
+                updateSavingsTable(); // refresh table
+            }
+
         } else {
-            JOptionPane.showMessageDialog(this, "Select a savings goal to remove.");
+            JOptionPane.showMessageDialog(this, "Please select a savings goal to remove.");
         }
     }//GEN-LAST:event_rmvsavingsActionPerformed
+
+    private void searchbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchbtnActionPerformed
+        String keyword = searchField.getText().trim();
+        if (keyword.isEmpty()) {
+            JOptionPane.showMessageDialog(newsPanel, "Please enter a keyword to search.");
+            return;
+        }
+
+        newsPanel.setText("Searching for \"" + keyword + "\"...");
+        new Thread(() -> {
+            String results = new FetchNews().getFinanceHeadlines(keyword);
+            SwingUtilities.invokeLater(() -> newsPanel.setText(results));
+        }).start();
+    }//GEN-LAST:event_searchbtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -2035,7 +2078,6 @@ public class MaInView extends javax.swing.JFrame {
     private javax.swing.JLabel expenseslbl2;
     private javax.swing.JTextField goalnamebtn;
     private javax.swing.JLabel goalnamelbl;
-    private javax.swing.JButton jButton1;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
@@ -2043,19 +2085,21 @@ public class MaInView extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable2;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea newsPanel;
+    private javax.swing.JTabbedPane newspanel;
     private javax.swing.JLabel remainingbudgetlbl;
     private javax.swing.JLabel remainingbudgetlbl2;
     private javax.swing.JButton rmvsavings;
     private javax.swing.JButton rmvtransaction;
     private javax.swing.JButton savingsbtn;
+    private javax.swing.JTextField searchField;
+    private javax.swing.JButton searchbtn;
     private javax.swing.JButton setbudgetbtn;
     private javax.swing.JTextField targetamtfield;
     private javax.swing.JLabel totalexpenselbl;
