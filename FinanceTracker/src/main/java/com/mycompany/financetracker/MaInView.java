@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.general.DefaultPieDataset;
 
 
 /*
@@ -52,6 +56,38 @@ public class MaInView extends javax.swing.JFrame {
         });
         
     }
+    
+    
+    private void showExpensePieChart() {
+        DefaultPieDataset dataset = new DefaultPieDataset();
+
+        // Aggregate expenses by category
+        for (Transaction t : transactionManager.getAllTransactions()) {
+            if (t.getType().equals("Expense")) {
+                String cat = t.getCategory();
+                double existing = dataset.getValue(cat) == null ? 0 : dataset.getValue(cat).doubleValue();
+                dataset.setValue(cat, existing + t.getAmount());
+            }
+        }
+
+        JFreeChart chart = ChartFactory.createPieChart(
+            "Expenses by Category", dataset, true, true, false
+        );
+
+        ChartPanel chartPanel = new ChartPanel(chart);
+        JFrame chartFrame = new JFrame("Expense Chart");
+        chartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        chartFrame.setContentPane(chartPanel);
+        chartFrame.setSize(600, 400);
+        chartFrame.setLocationRelativeTo(null);
+        chartFrame.setVisible(true);
+    }
+    
+    
+    
+    
+    
+    
     
     private void loadAllData() {
         try {
@@ -149,7 +185,7 @@ public class MaInView extends javax.swing.JFrame {
         for (int i = all.size() - 1; i >= 0; i--) {
             Transaction t = all.get(i);
             model.insertRow(0, new Object[]{
-                t.getId(), t.getCategory(), t.getAmount(), t.getType(), t.getDate().toString()
+                t.getId(), t.getCategory(), String.format("$%.2f", t.getAmount()), t.getType(), t.getDate().toString()
             });
         }
     }
@@ -207,6 +243,9 @@ public class MaInView extends javax.swing.JFrame {
         remainingbudgetlbl2 = new javax.swing.JLabel();
         budgetprogressbar = new javax.swing.JProgressBar();
         jPanel6 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
         jPanel3 = new javax.swing.JPanel();
         totalincomelbl = new javax.swing.JLabel();
         totalexpenselbl = new javax.swing.JLabel();
@@ -1320,7 +1359,7 @@ public class MaInView extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(46, 46, 46)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(55, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1507,7 +1546,7 @@ public class MaInView extends javax.swing.JFrame {
                                     .addGroup(jPanel5Layout.createSequentialGroup()
                                         .addGap(121, 121, 121)
                                         .addComponent(rmvsavings)))))))
-                .addContainerGap(55, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1579,7 +1618,7 @@ public class MaInView extends javax.swing.JFrame {
                             .addComponent(remainingbudgetlbl2)
                             .addComponent(expenseslbl2)))
                     .addComponent(budgetprogressbar, javax.swing.GroupLayout.PREFERRED_SIZE, 312, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(381, Short.MAX_VALUE))
+                .addContainerGap(306, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1599,23 +1638,37 @@ public class MaInView extends javax.swing.JFrame {
                     .addComponent(remainingbudgetlbl2))
                 .addGap(30, 30, 30)
                 .addComponent(budgetprogressbar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(306, Short.MAX_VALUE))
+                .addContainerGap(284, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Budget", jPanel4);
+
+        jButton1.setText("Show Expense Chart");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 792, Short.MAX_VALUE)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(57, 57, 57)
+                .addComponent(jButton1)
+                .addContainerGap(508, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 548, Short.MAX_VALUE)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(35, 35, 35)
+                .addComponent(jButton1)
+                .addContainerGap(468, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Charts", jPanel6);
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane3.setViewportView(jTextArea1);
+
+        jTabbedPane1.addTab("News", jScrollPane3);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -1640,8 +1693,8 @@ public class MaInView extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 792, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 717, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(93, 93, 93)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(totalexpenselbl, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
@@ -1654,14 +1707,16 @@ public class MaInView extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(153, 153, 153)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 583, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(354, 354, 354))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 561, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(totalincomelbl)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(totalexpenselbl))
+                .addComponent(totalexpenselbl)
+                .addContainerGap(11, Short.MAX_VALUE))
         );
 
         pack();
@@ -1739,7 +1794,8 @@ public class MaInView extends javax.swing.JFrame {
 
             // Add to table (at top)
             DefaultTableModel model = (DefaultTableModel) transactiontbl.getModel();
-            model.insertRow(0, new Object[]{id, category, amount, type, date.toString()});
+            model.insertRow(0, new Object[]{id, category, String.format("$%.2f", amount), type, date.toString()});
+
 
             // Update totals and budget
             if (type.equals("Income")) {
@@ -1979,6 +2035,7 @@ public class MaInView extends javax.swing.JFrame {
     private javax.swing.JLabel expenseslbl2;
     private javax.swing.JTextField goalnamebtn;
     private javax.swing.JLabel goalnamelbl;
+    private javax.swing.JButton jButton1;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
@@ -1990,8 +2047,10 @@ public class MaInView extends javax.swing.JFrame {
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable2;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JLabel remainingbudgetlbl;
     private javax.swing.JLabel remainingbudgetlbl2;
     private javax.swing.JButton rmvsavings;
