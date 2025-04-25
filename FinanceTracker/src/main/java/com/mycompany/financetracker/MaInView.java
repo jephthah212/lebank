@@ -1,5 +1,8 @@
 package com.mycompany.financetracker;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +23,17 @@ import javax.swing.table.DefaultTableModel;
 
 
 public class MaInView extends javax.swing.JFrame {
-    private TransactionManager transactionManager = new TransactionManager();
-    private Budget budget = new Budget(1000);
+    private final String TRANSACTION_FILE = "transactions.csv";
+    private final String BUDGET_FILE = "budget.txt";
+    private final String SAVINGS_FILE = "savings.csv";
+    
+    private final DatabaseManager dbManager = new DatabaseManager();
+    private final TransactionManager transactionManager = new TransactionManager();
     private List<SavingsGoal> savingsGoals = new ArrayList<>();
+    private Budget budget = new Budget(1000);
+
+    private double totalIncome = 0;
+    private double totalExpenses = 0;
 
     /**
      * Creates new form MaInView
@@ -31,7 +42,62 @@ public class MaInView extends javax.swing.JFrame {
     
     public MaInView() {
         initComponents();
+        loadAllData();
+        updateTotalsUI();
+
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                saveAllData();
+            }
+        });
+        
     }
+    
+    private void loadAllData() {
+        try {
+            List<Transaction> loadedTxns = dbManager.loadTransactionsFromCSV(TRANSACTION_FILE);
+            DefaultTableModel model = (DefaultTableModel) transactiontbl.getModel();
+            model.setRowCount(0);
+            
+            // Add each transaction to manager and table
+            for (Transaction t : loadedTxns) {
+                transactionManager.addTransaction(t);
+                model.insertRow(0, new Object[]{t.getId(), t.getCategory(), t.getAmount(), t.getType(), t.getDate()});
+                if (t.getType().equals("Income")) {
+                    totalIncome += t.getAmount();
+                } else if (t.getType().equals("Expense")) {
+                    totalExpenses += t.getAmount();
+                }
+            }
+
+            // Load budget info from file
+            budget = dbManager.loadBudget(BUDGET_FILE);
+            updateBudgetUI();
+            
+            // Load savings goals
+            savingsGoals = dbManager.loadSavingsGoals(SAVINGS_FILE);
+            updateSavingsTable();
+
+        } catch (IOException e) {
+            System.out.println("No saved data found. Starting fresh.");
+        }
+    }
+    
+    private void saveAllData() {
+        try {
+            dbManager.saveTransactionsToCSV(transactionManager.getAllTransactions(), TRANSACTION_FILE);
+            dbManager.saveBudget(budget.getMonthlyLimit(), budget.getMonthlyLimit() - budget.getRemainingBudget(), BUDGET_FILE);
+            dbManager.saveSavingsGoals(savingsGoals, SAVINGS_FILE);
+        } catch (IOException e) {
+            System.out.println("Error saving data: " + e.getMessage());
+        }
+    }
+    
+    private void updateTotalsUI() {
+        totalincomelbl.setText(String.format("Total Income: $%.2f", totalIncome));
+        totalexpenselbl.setText(String.format("Total Expenses: $%.2f", totalExpenses));
+    }
+
     
     private void updateBudgetUI() {
         double totalExpenses = transactionManager.getMonthlyExpenses();
@@ -61,6 +127,34 @@ public class MaInView extends javax.swing.JFrame {
             });
         }
     }
+    
+    private String capitalizeFirstLetter(String input) {
+        if (input == null || input.isEmpty()) return input;
+        return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
+    }
+    
+    private void reassignTransactionIds() {
+        int newId = 1;
+        for (Transaction t : transactionManager.getAllTransactions()) {
+            // Create new transaction with updated ID
+            Transaction updated = new Transaction(newId++, t.getCategory(), t.getAmount(), t.getDate(), t.getType());
+            transactionManager.getAllTransactions().set(newId - 2, updated);
+        }
+    }
+    
+    private void updateTransactionTable() {
+        DefaultTableModel model = (DefaultTableModel) transactiontbl.getModel();
+        model.setRowCount(0); // clear table
+        List<Transaction> all = transactionManager.getAllTransactions();
+        for (int i = all.size() - 1; i >= 0; i--) {
+            Transaction t = all.get(i);
+            model.insertRow(0, new Object[]{
+                t.getId(), t.getCategory(), t.getAmount(), t.getType(), t.getDate().toString()
+            });
+        }
+    }
+    
+    
 
 
     
@@ -88,8 +182,8 @@ public class MaInView extends javax.swing.JFrame {
         transactiontbl = new javax.swing.JTable();
         transactionbtn = new javax.swing.JButton();
         datelbl = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        edttransactions = new javax.swing.JButton();
+        rmvtransaction = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         goalnamelbl = new javax.swing.JLabel();
         goalnamebtn = new javax.swing.JTextField();
@@ -101,6 +195,8 @@ public class MaInView extends javax.swing.JFrame {
         jProgressBar1 = new javax.swing.JProgressBar();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
+        edtsavings = new javax.swing.JButton();
+        rmvsavings = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         budgetlimitlbl = new javax.swing.JLabel();
         budgetLimitField = new javax.swing.JTextField();
@@ -112,6 +208,8 @@ public class MaInView extends javax.swing.JFrame {
         budgetprogressbar = new javax.swing.JProgressBar();
         jPanel6 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
+        totalincomelbl = new javax.swing.JLabel();
+        totalexpenselbl = new javax.swing.JLabel();
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
@@ -1143,14 +1241,28 @@ public class MaInView extends javax.swing.JFrame {
 
         datelbl.setText("Date:");
 
-        jButton1.setText("Export Transactions");
+        edttransactions.setText("Edit Transaction");
+        edttransactions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edttransactionsActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Import Transactions");
+        rmvtransaction.setText("Remove Transaction");
+        rmvtransaction.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rmvtransactionActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(82, 82, 82)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(109, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addGap(42, 42, 42)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1169,14 +1281,10 @@ public class MaInView extends javax.swing.JFrame {
                     .addComponent(datelbl))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(rmvtransaction)
                     .addComponent(transactionbtn)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
-                .addGap(72, 72, 72))
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(82, 82, 82)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(93, Short.MAX_VALUE))
+                    .addComponent(edttransactions))
+                .addGap(93, 93, 93))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1197,10 +1305,10 @@ public class MaInView extends javax.swing.JFrame {
                             .addComponent(datelbl)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton2)))
-                .addGap(16, 16, 16)
+                        .addComponent(edttransactions)))
+                .addGap(2, 2, 2)
+                .addComponent(rmvtransaction)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(49, Short.MAX_VALUE))
         );
@@ -1212,7 +1320,7 @@ public class MaInView extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(46, 46, 46)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(71, Short.MAX_VALUE))
+                .addContainerGap(55, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1351,6 +1459,20 @@ public class MaInView extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(jTable2);
 
+        edtsavings.setText("Edit Savings");
+        edtsavings.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtsavingsActionPerformed(evt);
+            }
+        });
+
+        rmvsavings.setText("Remove Savings");
+        rmvsavings.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rmvsavingsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -1368,14 +1490,23 @@ public class MaInView extends javax.swing.JFrame {
                             .addComponent(jLabel2))
                         .addGap(26, 26, 26)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(targetamtfield, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(goalnamebtn, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(78, 78, 78)
                                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(savingsbtn)))
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addComponent(goalnamebtn, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(targetamtfield, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addGap(77, 77, 77)
+                                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                                .addComponent(savingsbtn)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(edtsavings))))
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addGap(121, 121, 121)
+                                        .addComponent(rmvsavings)))))))
                 .addContainerGap(55, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
@@ -1385,11 +1516,17 @@ public class MaInView extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(goalnamelbl)
                     .addComponent(goalnamebtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(savingsbtn))
-                .addGap(31, 31, 31)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(targetamtfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(savingsbtn)
+                    .addComponent(edtsavings))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(31, 31, 31)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(targetamtfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(rmvsavings)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1491,16 +1628,25 @@ public class MaInView extends javax.swing.JFrame {
             .addGap(0, 100, Short.MAX_VALUE)
         );
 
+        totalincomelbl.setText("Total Income: $0.00");
+
+        totalexpenselbl.setText("Total Expense: $0.00");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 792, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(71, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 792, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(totalexpenselbl, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
+                        .addComponent(totalincomelbl, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1512,7 +1658,10 @@ public class MaInView extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 583, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(105, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(totalincomelbl)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(totalexpenselbl))
         );
 
         pack();
@@ -1531,7 +1680,7 @@ public class MaInView extends javax.swing.JFrame {
 
     private void savingsbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savingsbtnActionPerformed
         try {
-            String name = goalnamebtn.getText();
+            String name = capitalizeFirstLetter(goalnamebtn.getText());
             double target = Double.parseDouble(targetamtfield.getText());
             double saved = Double.parseDouble(amtsavedfield.getText());
 
@@ -1572,39 +1721,180 @@ public class MaInView extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_savingsbtnActionPerformed
 
+    private void goalnamebtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goalnamebtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_goalnamebtnActionPerformed
+
     private void transactionbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transactionbtnActionPerformed
         try {
-            String category = categoryfield.getText();
+            String category = capitalizeFirstLetter(categoryfield.getText());
             double amount = Double.parseDouble(amountfield.getText());
             String type = (String) typecombobox.getSelectedItem();
-            LocalDate date = LocalDate.now(); 
+            LocalDate date = LocalDate.now();
 
             // Create and add transaction
             int id = transactionManager.getNextId();
             Transaction t = new Transaction(id, category, amount, date, type);
             transactionManager.addTransaction(t);
 
-            // Update table
+            // Add to table (at top)
             DefaultTableModel model = (DefaultTableModel) transactiontbl.getModel();
             model.insertRow(0, new Object[]{id, category, amount, type, date.toString()});
 
-            // Update budget if expense
-            if (type.equals("Expense")) {
+            // Update totals and budget
+            if (type.equals("Income")) {
+                totalIncome += amount;
+            } else if (type.equals("Expense")) {
+                totalExpenses += amount;
                 budget.addExpense(amount);
                 updateBudgetUI();
             }
 
-            // Clear fields
+            updateTotalsUI(); // Update the income and expense labels
+
+            // Clear input fields
             categoryfield.setText("");
             amountfield.setText("");
+
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid amount.");
+            JOptionPane.showMessageDialog(this, "Please enter a valid number for amount.");
         }
     }//GEN-LAST:event_transactionbtnActionPerformed
 
-    private void goalnamebtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goalnamebtnActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_goalnamebtnActionPerformed
+    private void edttransactionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edttransactionsActionPerformed
+        int selectedRow = transactiontbl.getSelectedRow();
+        if (selectedRow >= 0) {
+            DefaultTableModel model = (DefaultTableModel) transactiontbl.getModel();
+            int id = (int) model.getValueAt(selectedRow, 0);
+            String category = (String) JOptionPane.showInputDialog(this, "Edit category:", model.getValueAt(selectedRow, 1));
+            String amountStr = JOptionPane.showInputDialog(this, "Edit amount:", model.getValueAt(selectedRow, 2));
+            String type = (String) JOptionPane.showInputDialog(this, "Edit type:", model.getValueAt(selectedRow, 3));
+
+            try {
+                double amount = Double.parseDouble(amountStr);
+
+                // Find the original transaction
+                Transaction original = null;
+                for (Transaction t : transactionManager.getAllTransactions()) {
+                    if (t.getId() == id) {
+                        original = t;
+                        break;
+                    }
+                }
+
+                if (original != null) {
+                    // Adjust totals
+                    if (original.getType().equals("Income")) {
+                        totalIncome -= original.getAmount();
+                    } else {
+                        totalExpenses -= original.getAmount();
+                    }
+
+                    // Update transaction
+                    original = new Transaction(id, category, amount, original.getDate(), type);
+                    transactionManager.getAllTransactions().set(selectedRow, original); // replace in list
+
+                    // Update table
+                    model.setValueAt(category, selectedRow, 1);
+                    model.setValueAt(amount, selectedRow, 2);
+                    model.setValueAt(type, selectedRow, 3);
+
+                    // Adjust new totals
+                    if (type.equals("Income")) {
+                        totalIncome += amount;
+                    } else {
+                        totalExpenses += amount;
+                    }
+
+                    updateTotalsUI();
+                    updateBudgetUI();
+                }
+
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Invalid amount.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Select a transaction to edit.");
+        }
+    }//GEN-LAST:event_edttransactionsActionPerformed
+
+    private void rmvtransactionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rmvtransactionActionPerformed
+        int selectedRow = transactiontbl.getSelectedRow();
+        if (selectedRow >= 0) {
+            DefaultTableModel model = (DefaultTableModel) transactiontbl.getModel();
+            int id = (int) model.getValueAt(selectedRow, 0);
+
+            // Find the transaction to remove
+            Transaction toRemove = null;
+            for (Transaction t : transactionManager.getAllTransactions()) {
+                if (t.getId() == id) {
+                    toRemove = t;
+                    break;
+                }
+            }
+
+            if (toRemove != null) {
+                // Adjust totals
+                if (toRemove.getType().equals("Income")) {
+                    totalIncome -= toRemove.getAmount();
+                } else {
+                    totalExpenses -= toRemove.getAmount();
+                }
+
+                // Remove and reset IDs
+                transactionManager.getAllTransactions().remove(toRemove);
+                reassignTransactionIds();
+
+                updateTransactionTable();  // Refreshes the table display
+                updateTotalsUI();
+                updateBudgetUI();
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Select a transaction to remove.");
+        }
+    }//GEN-LAST:event_rmvtransactionActionPerformed
+
+    private void edtsavingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtsavingsActionPerformed
+        int selectedRow = jTable2.getSelectedRow();
+        if (selectedRow >= 0) {
+            DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+            String name = (String) model.getValueAt(selectedRow, 0);
+            String targetStr = JOptionPane.showInputDialog(this, "Edit target amount:", model.getValueAt(selectedRow, 1));
+            String savedStr = JOptionPane.showInputDialog(this, "Edit amount saved:", model.getValueAt(selectedRow, 2));
+
+            try {
+                double target = Double.parseDouble(targetStr.replace("$", ""));
+                double saved = Double.parseDouble(savedStr.replace("$", ""));
+
+                SavingsGoal goal = new SavingsGoal(name, target);
+                goal.deposit(saved);
+
+                // Replace in the list
+                savingsGoals.set(savingsGoals.size() - 1 - selectedRow, goal);
+
+                updateSavingsTable();
+
+                if (goal.isGoalReached()) {
+                    JOptionPane.showMessageDialog(this, "Goal Reached!");
+                }
+
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Invalid number format.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Select a savings goal to edit.");
+        }        
+    }//GEN-LAST:event_edtsavingsActionPerformed
+
+    private void rmvsavingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rmvsavingsActionPerformed
+        int selectedRow = jTable2.getSelectedRow();
+        if (selectedRow >= 0) {
+            savingsGoals.remove(savingsGoals.size() - 1 - selectedRow); // reverse-order table
+            updateSavingsTable();
+        } else {
+            JOptionPane.showMessageDialog(this, "Select a savings goal to remove.");
+        }
+    }//GEN-LAST:event_rmvsavingsActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1683,12 +1973,12 @@ public class MaInView extends javax.swing.JFrame {
     private javax.swing.JTextField categoryfield;
     private javax.swing.JLabel categorylbl;
     private javax.swing.JLabel datelbl;
+    private javax.swing.JButton edtsavings;
+    private javax.swing.JButton edttransactions;
     private javax.swing.JLabel expenseslbl;
     private javax.swing.JLabel expenseslbl2;
     private javax.swing.JTextField goalnamebtn;
     private javax.swing.JLabel goalnamelbl;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
@@ -1704,9 +1994,13 @@ public class MaInView extends javax.swing.JFrame {
     private javax.swing.JTable jTable2;
     private javax.swing.JLabel remainingbudgetlbl;
     private javax.swing.JLabel remainingbudgetlbl2;
+    private javax.swing.JButton rmvsavings;
+    private javax.swing.JButton rmvtransaction;
     private javax.swing.JButton savingsbtn;
     private javax.swing.JButton setbudgetbtn;
     private javax.swing.JTextField targetamtfield;
+    private javax.swing.JLabel totalexpenselbl;
+    private javax.swing.JLabel totalincomelbl;
     private javax.swing.JButton transactionbtn;
     private javax.swing.JTable transactiontbl;
     private javax.swing.JComboBox<String> typecombobox;

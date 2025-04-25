@@ -18,7 +18,7 @@ public class Budget {
     }
 
     public void addExpense(double amount) {
-        this.currentExpenses += amount;
+        currentExpenses += amount;
     }
 
     public boolean isOverBudget() {
@@ -27,5 +27,9 @@ public class Budget {
 
     public double getRemainingBudget() {
         return monthlyLimit - currentExpenses;
+    }
+
+    public double getMonthlyLimit() {
+        return monthlyLimit;
     }
 }
