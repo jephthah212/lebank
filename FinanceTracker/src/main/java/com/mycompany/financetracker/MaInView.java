@@ -1952,7 +1952,7 @@ public class MaInView extends javax.swing.JFrame {
             }
         } else {
             JOptionPane.showMessageDialog(this, "Select a savings goal to edit.");
-        }        
+        }  
     }//GEN-LAST:event_edtsavingsActionPerformed
 
     private void rmvsavingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rmvsavingsActionPerformed
