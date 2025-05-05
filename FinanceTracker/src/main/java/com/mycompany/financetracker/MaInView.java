@@ -49,6 +49,23 @@ public class MaInView extends javax.swing.JFrame {
     
     public MaInView() {
         initComponents();
+        
+        DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "Category", "Amount", "Type", "Date"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Disable editing for all cells
+            }
+        };
+        transactiontbl.setModel(model);
+        
+        DefaultTableModel savingsModel = new DefaultTableModel(new String[]{"Goal Name", "Target Amount", "Amount Saved"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Disable editing for all cells
+            }
+        };
+        savingstable.setModel(savingsModel);
+        
         Color purple = new Color(180, 150, 255); // light pastel purple
         getContentPane().setBackground(purple);
         
@@ -151,7 +168,7 @@ public class MaInView extends javax.swing.JFrame {
     }
     
     private void updateSavingsTable() {
-        DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+        DefaultTableModel model = (DefaultTableModel) savingstable.getModel();
         model.setRowCount(0); // Clear table
 
         for (SavingsGoal g : savingsGoals) {
@@ -244,7 +261,7 @@ public class MaInView extends javax.swing.JFrame {
         savingsbtn = new javax.swing.JButton();
         jProgressBar1 = new javax.swing.JProgressBar();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        savingstable = new javax.swing.JTable();
         edtsavings = new javax.swing.JButton();
         rmvsavings = new javax.swing.JButton();
         financenewspanel = new javax.swing.JPanel();
@@ -1461,7 +1478,7 @@ public class MaInView extends javax.swing.JFrame {
             }
         });
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+        savingstable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -1568,7 +1585,7 @@ public class MaInView extends javax.swing.JFrame {
                 "Goal Name", "Target", "Saved", "Progress %"
             }
         ));
-        jScrollPane2.setViewportView(jTable2);
+        jScrollPane2.setViewportView(savingstable);
 
         edtsavings.setText("Edit Savings");
         edtsavings.addActionListener(new java.awt.event.ActionListener() {
@@ -1917,9 +1934,9 @@ public class MaInView extends javax.swing.JFrame {
     }//GEN-LAST:event_rmvtransactionActionPerformed
 
     private void edtsavingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtsavingsActionPerformed
-        int selectedRow = jTable2.getSelectedRow();
+        int selectedRow = savingstable.getSelectedRow();
         if (selectedRow >= 0) {
-            DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+            DefaultTableModel model = (DefaultTableModel) savingstable.getModel();
             String name = (String) model.getValueAt(selectedRow, 0);
             String targetStr = JOptionPane.showInputDialog(this, "Edit target amount:", model.getValueAt(selectedRow, 1));
             String savedStr = JOptionPane.showInputDialog(this, "Edit amount saved:", model.getValueAt(selectedRow, 2));
@@ -1949,7 +1966,7 @@ public class MaInView extends javax.swing.JFrame {
     }//GEN-LAST:event_edtsavingsActionPerformed
 
     private void rmvsavingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rmvsavingsActionPerformed
-        int selectedRow = jTable2.getSelectedRow();
+        int selectedRow = savingstable.getSelectedRow();
 
         if (selectedRow >= 0) {
             // Since table is in reverse order, map back to correct index
@@ -2079,7 +2096,6 @@ public class MaInView extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTable jTable2;
     private javax.swing.JTextArea newsPanel;
     private javax.swing.JTabbedPane newspanel;
     private javax.swing.JLabel remainingbudgetlbl;
@@ -2088,6 +2104,7 @@ public class MaInView extends javax.swing.JFrame {
     private javax.swing.JButton rmvtransaction;
     private javax.swing.JButton savingsbtn;
     private javax.swing.JPanel savingspanel;
+    private javax.swing.JTable savingstable;
     private javax.swing.JTextField searchField;
     private javax.swing.JButton searchbtn;
     private javax.swing.JButton setbudgetbtn;
