@@ -1,5 +1,6 @@
 package com.mycompany.financetracker;
 
+import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -48,6 +49,11 @@ public class MaInView extends javax.swing.JFrame {
     
     public MaInView() {
         initComponents();
+        Color purple = new Color(180, 150, 255); // light pastel purple
+        getContentPane().setBackground(purple);
+        
+        
+        
         loadAllData();
         updateTotalsUI();
         setTitle("Finance Tracker");  
@@ -140,7 +146,7 @@ public class MaInView extends javax.swing.JFrame {
         budgetprogressbar.setValue(percentUsed);
 
         if (budget.isOverBudget()) {
-            JOptionPane.showMessageDialog(this, "Warning: You are over your budget!");
+            JOptionPane.showMessageDialog(this, "Warning: You are over your budget!", "Over Budget", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -207,7 +213,7 @@ public class MaInView extends javax.swing.JFrame {
         jComboBox1 = new javax.swing.JComboBox<>();
         newspanel = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
+        transactionspanel = new javax.swing.JPanel();
         categorylbl = new javax.swing.JLabel();
         categoryfield = new javax.swing.JTextField();
         amountlbl = new javax.swing.JLabel();
@@ -217,10 +223,18 @@ public class MaInView extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         transactiontbl = new javax.swing.JTable();
         transactionbtn = new javax.swing.JButton();
-        datelbl = new javax.swing.JLabel();
         edttransactions = new javax.swing.JButton();
         rmvtransaction = new javax.swing.JButton();
-        jPanel5 = new javax.swing.JPanel();
+        budgetpanel = new javax.swing.JPanel();
+        budgetlimitlbl = new javax.swing.JLabel();
+        budgetLimitField = new javax.swing.JTextField();
+        setbudgetbtn = new javax.swing.JButton();
+        expenseslbl = new javax.swing.JLabel();
+        expenseslbl2 = new javax.swing.JLabel();
+        remainingbudgetlbl = new javax.swing.JLabel();
+        remainingbudgetlbl2 = new javax.swing.JLabel();
+        budgetprogressbar = new javax.swing.JProgressBar();
+        savingspanel = new javax.swing.JPanel();
         goalnamelbl = new javax.swing.JLabel();
         goalnamebtn = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -233,30 +247,22 @@ public class MaInView extends javax.swing.JFrame {
         jTable2 = new javax.swing.JTable();
         edtsavings = new javax.swing.JButton();
         rmvsavings = new javax.swing.JButton();
-        jPanel4 = new javax.swing.JPanel();
-        budgetlimitlbl = new javax.swing.JLabel();
-        budgetLimitField = new javax.swing.JTextField();
-        setbudgetbtn = new javax.swing.JButton();
-        expenseslbl = new javax.swing.JLabel();
-        expenseslbl2 = new javax.swing.JLabel();
-        remainingbudgetlbl = new javax.swing.JLabel();
-        remainingbudgetlbl2 = new javax.swing.JLabel();
-        budgetprogressbar = new javax.swing.JProgressBar();
-        jPanel7 = new javax.swing.JPanel();
+        financenewspanel = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         newsPanel = new javax.swing.JTextArea();
         searchField = new javax.swing.JTextField();
         searchbtn = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
         totalincomelbl = new javax.swing.JLabel();
         totalexpenselbl = new javax.swing.JLabel();
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setBackground(new java.awt.Color(255, 0, 0));
+        setBackground(new java.awt.Color(255, 0, 204));
 
         newspanel.setBackground(new java.awt.Color(255, 0, 0));
+
+        transactionspanel.setBackground(new java.awt.Color(204, 0, 255));
 
         categorylbl.setText("Category:");
 
@@ -1282,8 +1288,6 @@ public class MaInView extends javax.swing.JFrame {
             }
         });
 
-        datelbl.setText("Date:");
-
         edttransactions.setText("Edit Transaction");
         edttransactions.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1298,55 +1302,51 @@ public class MaInView extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout transactionspanelLayout = new javax.swing.GroupLayout(transactionspanel);
+        transactionspanel.setLayout(transactionspanelLayout);
+        transactionspanelLayout.setHorizontalGroup(
+            transactionspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(transactionspanelLayout.createSequentialGroup()
                 .addGap(82, 82, 82)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(109, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, transactionspanelLayout.createSequentialGroup()
                 .addGap(42, 42, 42)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(transactionspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(categorylbl, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(amountlbl))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(transactionspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(amountfield, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
                     .addComponent(categoryfield))
                 .addGap(50, 50, 50)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(typelbl, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(typecombobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(datelbl))
+                .addComponent(typelbl, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(typecombobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(transactionspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(rmvtransaction)
                     .addComponent(transactionbtn)
                     .addComponent(edttransactions))
                 .addGap(93, 93, 93))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        transactionspanelLayout.setVerticalGroup(
+            transactionspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(transactionspanelLayout.createSequentialGroup()
                 .addGap(56, 56, 56)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(transactionspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(categorylbl)
                     .addComponent(categoryfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(typelbl)
                     .addComponent(typecombobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(transactionbtn))
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(transactionspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(transactionspanelLayout.createSequentialGroup()
                         .addGap(26, 26, 26)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addGroup(transactionspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(amountlbl)
-                            .addComponent(amountfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(datelbl)))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addComponent(amountfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(transactionspanelLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(edttransactions)))
                 .addGap(2, 2, 2)
@@ -1361,18 +1361,86 @@ public class MaInView extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(46, 46, 46)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(transactionspanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(20, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(transactionspanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         newspanel.addTab("Transactions", jPanel1);
+
+        budgetpanel.setBackground(new java.awt.Color(204, 0, 255));
+
+        budgetlimitlbl.setText("Monthly Budget Limit:");
+
+        setbudgetbtn.setText("Set Budget");
+        setbudgetbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setbudgetbtnActionPerformed(evt);
+            }
+        });
+
+        expenseslbl.setText("Total Expenses This Month:");
+
+        expenseslbl2.setText("$0.00");
+
+        remainingbudgetlbl.setText("Remaining Budget:");
+
+        remainingbudgetlbl2.setText("$0.00");
+
+        javax.swing.GroupLayout budgetpanelLayout = new javax.swing.GroupLayout(budgetpanel);
+        budgetpanel.setLayout(budgetpanelLayout);
+        budgetpanelLayout.setHorizontalGroup(
+            budgetpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(budgetpanelLayout.createSequentialGroup()
+                .addGap(43, 43, 43)
+                .addGroup(budgetpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(budgetpanelLayout.createSequentialGroup()
+                        .addComponent(budgetlimitlbl)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(budgetLimitField, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(setbudgetbtn))
+                    .addGroup(budgetpanelLayout.createSequentialGroup()
+                        .addGroup(budgetpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(expenseslbl, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(remainingbudgetlbl))
+                        .addGap(41, 41, 41)
+                        .addGroup(budgetpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(remainingbudgetlbl2)
+                            .addComponent(expenseslbl2)))
+                    .addComponent(budgetprogressbar, javax.swing.GroupLayout.PREFERRED_SIZE, 312, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(306, Short.MAX_VALUE))
+        );
+        budgetpanelLayout.setVerticalGroup(
+            budgetpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(budgetpanelLayout.createSequentialGroup()
+                .addGap(34, 34, 34)
+                .addGroup(budgetpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(budgetlimitlbl)
+                    .addComponent(budgetLimitField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(setbudgetbtn))
+                .addGap(42, 42, 42)
+                .addGroup(budgetpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(expenseslbl, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(expenseslbl2))
+                .addGap(28, 28, 28)
+                .addGroup(budgetpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(remainingbudgetlbl)
+                    .addComponent(remainingbudgetlbl2))
+                .addGap(30, 30, 30)
+                .addComponent(budgetprogressbar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(284, Short.MAX_VALUE))
+        );
+
+        newspanel.addTab("Budget", budgetpanel);
+
+        savingspanel.setBackground(new java.awt.Color(204, 0, 204));
 
         goalnamelbl.setText("Goal Name");
 
@@ -1516,136 +1584,73 @@ public class MaInView extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(68, 68, 68)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(amtsavedlbl)
-                        .addGap(30, 30, 30)
-                        .addComponent(amtsavedfield, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(goalnamelbl)
-                            .addComponent(jLabel2))
-                        .addGap(26, 26, 26)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(goalnamebtn, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(targetamtfield, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel5Layout.createSequentialGroup()
-                                        .addGap(77, 77, 77)
-                                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                                .addComponent(savingsbtn)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(edtsavings))))
-                                    .addGroup(jPanel5Layout.createSequentialGroup()
-                                        .addGap(121, 121, 121)
-                                        .addComponent(rmvsavings)))))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        javax.swing.GroupLayout savingspanelLayout = new javax.swing.GroupLayout(savingspanel);
+        savingspanel.setLayout(savingspanelLayout);
+        savingspanelLayout.setHorizontalGroup(
+            savingspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(savingspanelLayout.createSequentialGroup()
+                .addGroup(savingspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(savingspanelLayout.createSequentialGroup()
+                        .addGap(48, 48, 48)
+                        .addGroup(savingspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(amtsavedlbl)
+                            .addGroup(savingspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(goalnamelbl)
+                                .addComponent(jLabel2)))
+                        .addGap(45, 45, 45)
+                        .addGroup(savingspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(goalnamebtn, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(targetamtfield, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(amtsavedfield, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(savingspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(savingspanelLayout.createSequentialGroup()
+                                .addGap(108, 108, 108)
+                                .addComponent(rmvsavings))
+                            .addGroup(savingspanelLayout.createSequentialGroup()
+                                .addGap(60, 60, 60)
+                                .addComponent(savingsbtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(edtsavings))
+                            .addGroup(savingspanelLayout.createSequentialGroup()
+                                .addGap(25, 25, 25)
+                                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(savingspanelLayout.createSequentialGroup()
+                        .addGap(113, 113, 113)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        savingspanelLayout.setVerticalGroup(
+            savingspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(savingspanelLayout.createSequentialGroup()
                 .addGap(51, 51, 51)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(savingspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(goalnamelbl)
                     .addComponent(goalnamebtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(savingsbtn)
                     .addComponent(edtsavings))
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(savingspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(savingspanelLayout.createSequentialGroup()
                         .addGap(31, 31, 31)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addGroup(savingspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
                             .addComponent(targetamtfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
+                    .addGroup(savingspanelLayout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addComponent(rmvsavings)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(savingspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(savingspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(amtsavedlbl)
                         .addComponent(amtsavedfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(24, 24, 24)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(19, 19, 19))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        newspanel.addTab("Savings", jPanel5);
+        newspanel.addTab("Savings", savingspanel);
 
-        budgetlimitlbl.setText("Monthly Budget Limit:");
-
-        setbudgetbtn.setText("Set Budget");
-        setbudgetbtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                setbudgetbtnActionPerformed(evt);
-            }
-        });
-
-        expenseslbl.setText("Total Expenses This Month:");
-
-        expenseslbl2.setText("$0.00");
-
-        remainingbudgetlbl.setText("Remaining Budget:");
-
-        remainingbudgetlbl2.setText("$0.00");
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(43, 43, 43)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(budgetlimitlbl)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(budgetLimitField, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(setbudgetbtn))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(expenseslbl, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(remainingbudgetlbl))
-                        .addGap(41, 41, 41)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(remainingbudgetlbl2)
-                            .addComponent(expenseslbl2)))
-                    .addComponent(budgetprogressbar, javax.swing.GroupLayout.PREFERRED_SIZE, 312, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(306, Short.MAX_VALUE))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(34, 34, 34)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(budgetlimitlbl)
-                    .addComponent(budgetLimitField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(setbudgetbtn))
-                .addGap(42, 42, 42)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(expenseslbl, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(expenseslbl2))
-                .addGap(28, 28, 28)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(remainingbudgetlbl)
-                    .addComponent(remainingbudgetlbl2))
-                .addGap(30, 30, 30)
-                .addComponent(budgetprogressbar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(284, Short.MAX_VALUE))
-        );
-
-        newspanel.addTab("Budget", jPanel4);
+        financenewspanel.setBackground(new java.awt.Color(204, 0, 153));
 
         newsPanel.setColumns(20);
         newsPanel.setRows(5);
@@ -1660,26 +1665,26 @@ public class MaInView extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
+        javax.swing.GroupLayout financenewspanelLayout = new javax.swing.GroupLayout(financenewspanel);
+        financenewspanel.setLayout(financenewspanelLayout);
+        financenewspanelLayout.setHorizontalGroup(
+            financenewspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(financenewspanelLayout.createSequentialGroup()
                 .addGap(23, 23, 23)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 595, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(99, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, financenewspanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(searchbtn)
                 .addGap(50, 50, 50))
         );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+        financenewspanelLayout.setVerticalGroup(
+            financenewspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, financenewspanelLayout.createSequentialGroup()
                 .addContainerGap(10, Short.MAX_VALUE)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(financenewspanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(searchbtn))
                 .addGap(18, 18, 18)
@@ -1687,18 +1692,7 @@ public class MaInView extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        newspanel.addTab("News", jPanel7);
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
+        newspanel.addTab("News", financenewspanel);
 
         totalincomelbl.setText("Total Income: $0.00");
 
@@ -1712,27 +1706,19 @@ public class MaInView extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(87, 87, 87)
-                        .addComponent(newspanel, javax.swing.GroupLayout.PREFERRED_SIZE, 717, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(97, 97, 97)
+                        .addComponent(newspanel, javax.swing.GroupLayout.PREFERRED_SIZE, 717, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(totalexpenselbl, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
                         .addComponent(totalincomelbl, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(112, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(153, 153, 153)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(354, 354, 354))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(newspanel, javax.swing.GroupLayout.PREFERRED_SIZE, 561, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                .addGap(40, 40, 40)
+                .addComponent(newspanel, javax.swing.GroupLayout.PREFERRED_SIZE, 561, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(totalincomelbl)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(totalexpenselbl)
@@ -1747,9 +1733,9 @@ public class MaInView extends javax.swing.JFrame {
             double limit = Double.parseDouble(budgetLimitField.getText());
             budget = new Budget(limit); // Replace with new budget
             updateBudgetUI();
-            JOptionPane.showMessageDialog(this, "Budget updated!");
+            JOptionPane.showMessageDialog(this, "Budget updated!", "Budget Updated", JOptionPane.ERROR_MESSAGE);
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Enter a valid number for budget.");
+            JOptionPane.showMessageDialog(this, "Enter a valid number for budget.", "Valid Number", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_setbudgetbtnActionPerformed
 
@@ -1788,11 +1774,11 @@ public class MaInView extends javax.swing.JFrame {
             amtsavedfield.setText("");
 
             if (goal.isGoalReached()) {
-                JOptionPane.showMessageDialog(this, "Your Saving goals have been reached!");
+                JOptionPane.showMessageDialog(this, "Your Saving goals have been reached!", "Savings Reached", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Enter valid numbers for amount and target.");
+            JOptionPane.showMessageDialog(this, "Enter valid numbers for amount and target.", "Valid Number", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_savingsbtnActionPerformed
 
@@ -1833,7 +1819,7 @@ public class MaInView extends javax.swing.JFrame {
             amountfield.setText("");
 
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid number for amount.");
+            JOptionPane.showMessageDialog(this, "Please enter a valid number for amount.", "Enter Valid Amount", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_transactionbtnActionPerformed
 
@@ -1842,7 +1828,7 @@ public class MaInView extends javax.swing.JFrame {
         if (selectedRow >= 0) {
             DefaultTableModel model = (DefaultTableModel) transactiontbl.getModel();
             int id = (int) model.getValueAt(selectedRow, 0);
-            String category = (String) JOptionPane.showInputDialog(this, "Edit category:", model.getValueAt(selectedRow, 1));
+            String category = (String) JOptionPane.showInputDialog(this, "Edit category:", "Edit Transaction Category",JOptionPane.PLAIN_MESSAGE,null, null, model.getValueAt(selectedRow, 1));
             String amountStr = JOptionPane.showInputDialog(this, "Edit amount:", model.getValueAt(selectedRow, 2));
             String type = (String) JOptionPane.showInputDialog(this, "Edit type:", model.getValueAt(selectedRow, 3));
 
@@ -1887,10 +1873,10 @@ public class MaInView extends javax.swing.JFrame {
                 }
 
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Invalid amount.");
+                JOptionPane.showMessageDialog(this, "Invalid amount.", "Input Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
-            JOptionPane.showMessageDialog(this, "Select a transaction to edit.");
+            JOptionPane.showMessageDialog(this, "Select a transaction to edit.", "Edit Transaction", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_edttransactionsActionPerformed
 
@@ -1926,7 +1912,7 @@ public class MaInView extends javax.swing.JFrame {
                 updateBudgetUI();
             }
         } else {
-            JOptionPane.showMessageDialog(this, "Select a transaction to remove.");
+            JOptionPane.showMessageDialog(this, "Select a transaction to remove.", "Remove Transaction", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_rmvtransactionActionPerformed
 
@@ -2075,24 +2061,20 @@ public class MaInView extends javax.swing.JFrame {
     private javax.swing.JLabel amtsavedlbl;
     private javax.swing.JTextField budgetLimitField;
     private javax.swing.JLabel budgetlimitlbl;
+    private javax.swing.JPanel budgetpanel;
     private javax.swing.JProgressBar budgetprogressbar;
     private javax.swing.JTextField categoryfield;
     private javax.swing.JLabel categorylbl;
-    private javax.swing.JLabel datelbl;
     private javax.swing.JButton edtsavings;
     private javax.swing.JButton edttransactions;
     private javax.swing.JLabel expenseslbl;
     private javax.swing.JLabel expenseslbl2;
+    private javax.swing.JPanel financenewspanel;
     private javax.swing.JTextField goalnamebtn;
     private javax.swing.JLabel goalnamelbl;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -2105,6 +2087,7 @@ public class MaInView extends javax.swing.JFrame {
     private javax.swing.JButton rmvsavings;
     private javax.swing.JButton rmvtransaction;
     private javax.swing.JButton savingsbtn;
+    private javax.swing.JPanel savingspanel;
     private javax.swing.JTextField searchField;
     private javax.swing.JButton searchbtn;
     private javax.swing.JButton setbudgetbtn;
@@ -2112,6 +2095,7 @@ public class MaInView extends javax.swing.JFrame {
     private javax.swing.JLabel totalexpenselbl;
     private javax.swing.JLabel totalincomelbl;
     private javax.swing.JButton transactionbtn;
+    private javax.swing.JPanel transactionspanel;
     private javax.swing.JTable transactiontbl;
     private javax.swing.JComboBox<String> typecombobox;
     private javax.swing.JLabel typelbl;
