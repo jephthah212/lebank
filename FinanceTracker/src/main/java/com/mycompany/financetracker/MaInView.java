@@ -1858,7 +1858,7 @@ public class MaInView extends javax.swing.JFrame {
 
                     // Update table
                     model.setValueAt(category, selectedRow, 1);
-                    model.setValueAt(amount, selectedRow, 2);
+                    model.setValueAt(String.format("$%.2f", amount), selectedRow, 2);
                     model.setValueAt(type, selectedRow, 3);
 
                     // Adjust new totals
