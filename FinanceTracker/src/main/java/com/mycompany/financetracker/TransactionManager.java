@@ -13,6 +13,7 @@ import java.util.Set;
  */
 public class TransactionManager {
     private List<Transaction> transactions = new ArrayList<>();
+    
     private int nextId = 1;
 
     public void addTransaction(Transaction t) {
@@ -24,10 +25,15 @@ public class TransactionManager {
         return transactions;
     }
 
-    public int getNextId() {
-        List<Transaction> transactions = getAllTransactions();
+    public double getMonthlyExpenses() {
+        return transactions.stream()
+            .filter(t -> t.getType().equals("Expense"))
+            .mapToDouble(Transaction::getAmount)
+            .sum();
+    }
+    
+    public int getNextAvailableId() {
         Set<Integer> usedIds = new HashSet<>();
-
         for (Transaction t : transactions) {
             usedIds.add(t.getId());
         }
@@ -37,12 +43,5 @@ public class TransactionManager {
             id++;
         }
         return id;
-    }
-
-    public double getMonthlyExpenses() {
-        return transactions.stream()
-            .filter(t -> t.getType().equals("Expense"))
-            .mapToDouble(Transaction::getAmount)
-            .sum();
     }
 }

@@ -5,6 +5,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -52,6 +53,7 @@ public class MaInView extends javax.swing.JFrame {
         setTitle("Finance Tracker");  
         setLocationRelativeTo(null);  // center on screen
         setResizable(false); 
+        
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 saveAllData();
@@ -72,8 +74,6 @@ public class MaInView extends javax.swing.JFrame {
        newsPanel.setText("Fetching news...");
        
     }
-    
-    
     
     
     
@@ -174,12 +174,18 @@ public class MaInView extends javax.swing.JFrame {
     
     private void updateTransactionTable() {
         DefaultTableModel model = (DefaultTableModel) transactiontbl.getModel();
-        model.setRowCount(0); // clear table
-        List<Transaction> all = transactionManager.getAllTransactions();
-        for (int i = all.size() - 1; i >= 0; i--) {
-            Transaction t = all.get(i);
-            model.insertRow(0, new Object[]{
-                t.getId(), t.getCategory(), String.format("$%.2f", t.getAmount()), t.getType(), t.getDate().toString()
+        model.setRowCount(0); // Clear the table
+
+        List<Transaction> sorted = new ArrayList<>(transactionManager.getAllTransactions());
+        sorted.sort(Comparator.comparingInt(Transaction::getId)); // ✅ Sort by ID
+
+        for (Transaction t : sorted) {
+            model.addRow(new Object[]{
+                t.getId(),
+                t.getCategory(),
+                String.format("$%.2f", t.getAmount()),
+                t.getType(),
+                t.getDate().toString()
             });
         }
     }
@@ -1706,8 +1712,9 @@ public class MaInView extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(87, 87, 87)
                         .addComponent(newspanel, javax.swing.GroupLayout.PREFERRED_SIZE, 717, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(93, 93, 93)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(totalexpenselbl, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
@@ -1801,7 +1808,7 @@ public class MaInView extends javax.swing.JFrame {
             LocalDate date = LocalDate.now();
 
             // Create and add transaction
-            int id = transactionManager.getNextId();
+            int id = transactionManager.getNextAvailableId();
             Transaction t = new Transaction(id, category, amount, date, type);
             transactionManager.addTransaction(t);
 
